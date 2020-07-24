@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+message UserDetails {
+   string user_id = 1;
+   string vector = 2;
+   double version = 3;
+   map<string, string> ab_test_variants = 4;
+   bool is_logged_in = 5;
+}
+
+message DeviceState {
+   string connection_type = 1;
+   string carrier = 2;
+   string model = 3;
+   double latitude = 4;
+   double longitude = 5;
+}
+
+message Status {
+   string message = 1;
+   StatusType type = 2;
+}
+
+enum StatusType{
+  SUCCESS = 0;
+  FAILURE = 1;
+}
+
+message AdScore {
+   string object_id = 1;
+   double score = 2;
+}
+
+message AdScoresRequest {
+  UserDetails user_details = 1;
+  DeviceState device_state = 2;
+  string city = 3;
+  string state = 4;
+  repeated string object_ids = 5;
+}
+
+message AdScoresResponse {
+  Status status = 1;
+  repeated AdScore ad_scores = 2;
+  double total_count = 3;
+}
+
+service Adsrank {
+    rpc ScoreAdsUsingVector(AdScoresRequest) returns (AdScoresResponse) {}
+}

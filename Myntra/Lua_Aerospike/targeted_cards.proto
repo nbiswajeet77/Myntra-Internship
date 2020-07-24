@@ -1,0 +1,69 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.myntra.ingestion;
+enum StatusType {
+  ERROR = 0;
+  SUCCESS = 1;
+  WARNING = 2;
+}
+message Status {
+  int32 statusCode = 1;
+  string statusMessage = 2;
+  StatusType statusType = 3;
+  int64 totalCount = 4;
+}
+message CreateOnboardingCardRequest {
+  reserved 3;   // Reserving the 3 (seq field) to avoid any accidental reuse of the field number.
+  string user_id = 1;
+  reserved 2;   // Reserving tag 2 (object_id field) to avoid any accidental reuse of the field number.
+  int32 ttl = 4;
+  string content_type = 5;
+}
+message CreateTargetedCardRequest {
+  string user_id = 1;
+  string content_type = 2;
+  repeated int32 style_ids = 3;
+  repeated string children = 4;
+  int32 ttl = 5;
+  string object_data = 6;
+}
+message UnpublishCardRequest {
+  string user_id = 1;
+  reserved 2;   // Reserving tag 2 (feedtype field) to avoid any accidental reuse of the field number.
+  oneof identifier {
+    string object_id = 3;
+    string content_type = 4;
+  } 
+}
+message CardInformationRequest {
+  string user_id = 1;
+  string content_type = 2;
+}
+message CardOperationResponse {
+  Status status = 1;
+  reserved 2;   // Reserving tag 2 (object_id field) to avoid any accidental reuse of the field number.
+}
+message CardInformationResponse {
+  Status status = 1;
+  reserved 2;   // Reserving tag 2  to avoid any accidental reuse of the field number.
+  string user_id = 3;
+  string content_type =4;
+  TargetedCardInfo targeted_card_info = 5;
+}
+message TargetedCardInfo {
+	repeated int32 style_ids = 1;
+	repeated string children = 2;
+	int64 end_time = 3;
+  string object_data = 4;
+  int64 modified_at = 5;
+}
+service CardService {
+  rpc CreateOnboardingCard (CreateOnboardingCardRequest) returns (CardOperationResponse) {
+  }
+  rpc CreateTargetedCard (CreateTargetedCardRequest) returns (CardOperationResponse) {
+  }
+  rpc UnpublishCard (UnpublishCardRequest) returns (CardOperationResponse) {
+  }
+  rpc getCardInformation (CardInformationRequest) returns (CardInformationResponse) {
+  }
+}
